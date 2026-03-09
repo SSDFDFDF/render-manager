@@ -1,0 +1,22 @@
+{
+  "name": "render-manager",
+  "version": "2.0.0",
+  "description": "Multi-account Render service management system built on Cloudflare Workers",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "keywords": [
+    "render",
+    "cloudflare-workers",
+    "service-management",
+    "multi-account"
+  ],
+  "author": "sfun",
+  "license": "MIT",
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

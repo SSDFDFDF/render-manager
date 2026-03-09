@@ -1,0 +1,21 @@
+name = "render-manager"
+main = "src/index.js"
+compatibility_date = "2026-01-20"
+
+# Workers 日志
+[observability]
+enabled = false
+
+# KV 命名空间绑定，部署后，请记得在控制台绑定
+# [[kv_namespaces]]
+# binding = "RENDER_KV"
+# id = ""
+
+# 定时任务触发器
+[triggers]
+crons = ["*/5 * * * *"]  # 每5分钟执行
+
+# 环境变量
+[vars]
+ADMIN_USERNAME = "xjc"
+ADMIN_PASSWORD = "V6hnOwyGQJTRrqk7Dm0fY2MvjS3l4Abe"
