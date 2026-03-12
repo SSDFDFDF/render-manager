@@ -2224,7 +2224,6 @@ h1 {
   padding: 4px 8px;
   border-radius: 4px;
   margin-bottom: 2px;
-  white-space: pre-wrap;
   word-break: break-all;
 }
 
