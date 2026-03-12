@@ -1465,6 +1465,12 @@ h1 {
   transform: scale(1);
 }
 
+.modal-logs .modal-content {
+  max-width: 1000px;
+  width: 95%;
+  max-height: 90vh;
+}
+
 .modal-header {
   padding: 1.5rem;
   border-bottom: 1px solid var(--border-light);
@@ -2103,8 +2109,8 @@ h1 {
 
 /* 日志样式 */
 .logs-toolbar {
-  padding: 0.75rem 1.5rem;
-  background: var(--bg-paper);
+  padding: 0.5rem 1rem;
+  background: var(--bg-surface);
   border-bottom: 1px solid var(--border-light);
   display: flex;
   justify-content: space-between;
@@ -2155,7 +2161,6 @@ h1 {
 .filter-select:focus {
   outline: none;
   border-color: var(--accent-dark);
-  box-shadow: 0 0 0 3px rgba(45, 45, 45, 0.08);
 }
 
 .refresh-btn {
@@ -2183,13 +2188,14 @@ h1 {
   transform: scale(0.95);
 }
 
+/* 简化的复选框和下拉框样式，更符合CMD感 */
 .logs-filters select {
-  padding: 8px 12px;
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-sm);
-  font-size: 13px;
-  background: var(--bg-surface);
-  cursor: pointer;
+  padding: 0.25rem 1.5rem 0.25rem 0.5rem;
+  border: 1px solid var(--border-medium);
+  border-radius: 4px;
+  font-size: 12px;
+  height: 28px;
+  min-width: 60px;
 }
 
 .logs-filters select:focus {
@@ -2199,19 +2205,19 @@ h1 {
 
 .logs-body {
   padding: 0 !important;
-  max-height: calc(80vh - 180px);
+  max-height: calc(90vh - 120px);
 }
 
 .logs-container {
   font-family: var(--font-mono);
   font-size: 12px;
-  line-height: 1.6;
-  background: #1e1e1e;
-  color: #d4d4d4;
-  padding: 1rem;
+  line-height: 1.4;
+  background: #0c0c0c;
+  color: #cccccc;
+  padding: 0.75rem;
   overflow-x: auto;
   overflow-y: auto;
-  max-height: calc(80vh - 180px);
+  max-height: calc(90vh - 120px);
 }
 
 .log-entry {
@@ -2223,7 +2229,7 @@ h1 {
 }
 
 .log-entry:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .log-timestamp {

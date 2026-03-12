@@ -789,13 +789,12 @@ async function openLogsModal(accountId, serviceId, serviceName) {
 
   const accountName = allServices.find(s => s.id === serviceId && s.accountId === accountId)?.accountName || accountId;
   serviceInfo.replaceChildren(
-    document.createTextNode('查看 '),
+    document.createTextNode('Logs: '),
     (() => {
       const strong = document.createElement('strong');
       strong.textContent = serviceName;
       return strong;
-    })(),
-    document.createTextNode(' (' + accountName + ') 的服务日志')
+    })()
   );
 
   container.innerHTML = '<div class="loading" style="padding: 2rem; color: white;"><div class="loading-spinner"></div><p>加载日志中...</p></div>';

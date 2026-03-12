@@ -237,7 +237,7 @@ export function renderDashboard() {
   </div>
 
   <!-- 日志查看模态框 -->
-  <div id="logsModal" class="modal">
+  <div id="logsModal" class="modal modal-logs">
     <div class="modal-content">
       <div class="modal-header">
         <div>
