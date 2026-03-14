@@ -1308,7 +1308,7 @@ h1 {
 
 .service-actions {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 0.5rem;
 }
 
@@ -2592,7 +2592,7 @@ h1 {
 
   /* 服务操作按钮 */
   .service-actions {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 0.375rem;
   }
 

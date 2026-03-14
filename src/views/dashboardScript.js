@@ -775,6 +775,7 @@ function closeDeploysModal() {
 let currentLogsAccountId = '';
 let currentLogsServiceId = '';
 let currentLogsServiceName = '';
+let logsRefreshInterval = null;
 
 // 打开日志模态框
 async function openLogsModal(accountId, serviceId, serviceName) {
@@ -801,11 +802,21 @@ async function openLogsModal(accountId, serviceId, serviceName) {
 
   modal.classList.add('show');
 
+  const autoRefreshCheckbox = document.getElementById('autoRefreshLogsCheckbox');
+  if (autoRefreshCheckbox) {
+    if (logsRefreshInterval) clearInterval(logsRefreshInterval);
+    if (autoRefreshCheckbox.checked) {
+      logsRefreshInterval = setInterval(() => {
+        if (currentLogsServiceId) fetchLogs(true);
+      }, 5000);
+    }
+  }
+
   await fetchLogs();
 }
 
 // 获取日志
-async function fetchLogs() {
+async function fetchLogs(silent = false) {
   const container = document.getElementById('logsContainer');
   const levelFilter = document.getElementById('logLevelFilter').value;
   const limitFilter = document.getElementById('logLimitFilter').value;
@@ -820,12 +831,14 @@ async function fetchLogs() {
     renderLogs(data);
   } catch (error) {
     console.error('获取日志出错:', error);
-    container.innerHTML = \`
-      <div class="empty-state" style="color: white;">
-        <h3>加载日志出错</h3>
-        <p>\${escapeHtml(error?.message || String(error))}</p>
-      </div>
-    \`;
+    if (!silent) {
+      container.innerHTML = \`
+        <div class="empty-state" style="color: white;">
+          <h3>加载日志出错</h3>
+          <p>\${escapeHtml(error?.message || String(error))}</p>
+        </div>
+      \`;
+    }
   }
 }
 
@@ -840,6 +853,9 @@ function refreshLogs() {
 function renderLogs(data) {
   const container = document.getElementById('logsContainer');
   const logs = data.logs || data || [];
+
+  const previousScrollTop = container.scrollTop;
+  const wasScrolledToBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 10;
 
   if (!logs || logs.length === 0) {
     container.innerHTML = \`
@@ -883,6 +899,12 @@ function renderLogs(data) {
 
     container.appendChild(logEntry);
   });
+
+  if (wasScrolledToBottom) {
+    container.scrollTop = container.scrollHeight;
+  } else {
+    container.scrollTop = previousScrollTop;
+  }
 }
 
 // 关闭日志模态框
@@ -890,6 +912,11 @@ function closeLogsModal() {
   unlockBodyScroll();
   const modal = document.getElementById('logsModal');
   modal.classList.remove('show');
+
+  if (logsRefreshInterval) {
+    clearInterval(logsRefreshInterval);
+    logsRefreshInterval = null;
+  }
 
   currentLogsAccountId = '';
   currentLogsServiceId = '';
@@ -1668,6 +1695,22 @@ function initEventDelegation() {
   accountFilter?.addEventListener('change', () => {
     applyFilters();
   });
+
+  // 自动刷新复选框事件
+  const autoRefreshCheckbox = document.getElementById('autoRefreshLogsCheckbox');
+  if (autoRefreshCheckbox) {
+    autoRefreshCheckbox.addEventListener('change', (e) => {
+      if (logsRefreshInterval) {
+        clearInterval(logsRefreshInterval);
+        logsRefreshInterval = null;
+      }
+      if (e.target.checked && currentLogsServiceId) {
+        logsRefreshInterval = setInterval(() => {
+          if (currentLogsServiceId) fetchLogs(true);
+        }, 5000);
+      }
+    });
+  }
 
   const searchInput = document.getElementById('serviceSearch');
   searchInput?.addEventListener('input', () => {

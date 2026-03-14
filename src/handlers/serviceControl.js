@@ -151,3 +151,98 @@ export const handleRollbackDeploy = createDeployControlHandler(
   '回滚部署失败:',
   '已回滚到此部署'
 );
+
+/**
+ * 处理检查更新
+ * @param {Request} request - 请求对象
+ * @param {Array} match - 路由匹配结果
+ * @param {Object} env - 环境变量
+ * @returns {Promise<Response>} - 响应
+ */
+export async function handleCheckUpdate(request, match, env) {
+  const [, accountId, serviceId] = match;
+
+  return withAccount(
+    env,
+    accountId,
+    { notFoundMessage: '账户不存在', errorLogLabel: '检查更新失败:', errorResponseMessage: null },
+    async (account) => {
+      try {
+        // 1. 获取服务详情以获取 repo 和 branch
+        const service = await getServiceDetails(account, serviceId);
+        const repoUrl = service?.repo;
+        const branch = service?.branch;
+
+        if (!repoUrl) {
+          return jsonResponse({ hasUpdate: false, message: '未找到关联的代码仓库' });
+        }
+
+        if (!repoUrl.includes('github.com')) {
+          return jsonResponse({ hasUpdate: false, message: '目前仅支持通过 GitHub 仓库检查更新' });
+        }
+
+        // 解析 owner 和 repo, URL通常为 https://github.com/owner/repo
+        const urlObj = new URL(repoUrl);
+        const urlParts = urlObj.pathname.split('/').filter(Boolean); // e.g. ['owner', 'repo']
+        const owner = urlParts[0];
+        let repoName = urlParts[1];
+        if (repoName && repoName.endsWith('.git')) {
+          repoName = repoName.slice(0, -4);
+        }
+
+        if (!owner || !repoName || !branch) {
+          return jsonResponse({ hasUpdate: false, message: '无法解析 GitHub 仓库信息' });
+        }
+
+        // 2. 获取 GitHub 最新 commit
+        let latestGithubCommitSha = null;
+        let githubCommitMessage = null;
+        
+        try {
+          const githubApiUrl = `https://api.github.com/repos/${owner}/${repoName}/commits/${branch}`;
+          const githubResponse = await fetch(githubApiUrl, {
+            headers: {
+              'User-Agent': 'Render-Service-Manager',
+              'Accept': 'application/vnd.github.v3+json'
+            }
+          });
+
+          if (githubResponse.ok) {
+            const githubData = await githubResponse.json();
+            latestGithubCommitSha = githubData.sha;
+            githubCommitMessage = githubData.commit?.message;
+          } else {
+            return jsonResponse({ hasUpdate: false, message: `GitHub API 请求失败: ${githubResponse.status}` });
+          }
+        } catch (githubErr) {
+          console.error('获取 GitHub commit 失败:', githubErr);
+          return jsonResponse({ hasUpdate: false, message: '无法获取 Github 最新提交' });
+        }
+
+        // 3. 获取 Render 当前 Live 的部署
+        const deploys = await getDeploysForService(account, serviceId, 10);
+        const liveDeploy = (deploys || []).find(d => {
+          const deployInfo = d.deploy || d;
+          return deployInfo.status === 'live';
+        });
+
+        const deployInfo = liveDeploy ? (liveDeploy.deploy || liveDeploy) : null;
+        const liveCommitSha = deployInfo?.commit?.id;
+
+        const hasUpdate = Boolean(liveCommitSha && latestGithubCommitSha && latestGithubCommitSha !== liveCommitSha);
+
+        return jsonResponse({
+          hasUpdate,
+          latestCommit: {
+            id: latestGithubCommitSha,
+            message: githubCommitMessage
+          },
+          liveCommitId: liveCommitSha
+        });
+      } catch (error) {
+        console.error('检查更新出错:', error);
+        return jsonResponse({ error: '检查更新时发生错误', details: error.message }, 500);
+      }
+    }
+  );
+}

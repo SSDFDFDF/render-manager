@@ -163,6 +163,8 @@ export async function getServicesForAccount(account) {
         plan: service.serviceDetails?.plan,
         env: service.serviceDetails?.env,
         imagePath: service.imagePath,
+        repo: service.repo,
+        branch: service.branch,
         ownerId: service.ownerId
       };
     });

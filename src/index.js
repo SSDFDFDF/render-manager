@@ -14,7 +14,8 @@ import {
   handleRestartService,
   handleGetDeploys,
   handleCancelDeploy,
-  handleRollbackDeploy
+  handleRollbackDeploy,
+  handleCheckUpdate
 } from './handlers/serviceControl.js';
 import {
   handleGetInstances,
@@ -73,6 +74,7 @@ const dynamicRoutes = [
   { pattern: /^\/api\/deploys\/([^\/]+)\/([^\/]+)$/, method: 'GET', handler: handleGetDeploys, auth: true },
   { pattern: /^\/api\/deploys\/([^\/]+)\/([^\/]+)\/cancel$/, method: 'POST', handler: handleCancelDeploy, auth: true },
   { pattern: /^\/api\/deploys\/([^\/]+)\/([^\/]+)\/rollback$/, method: 'POST', handler: handleRollbackDeploy, auth: true },
+  { pattern: /^\/api\/services\/([^\/]+)\/([^\/]+)\/check-update$/, method: 'GET', handler: handleCheckUpdate, auth: true },
   // 监控路由
   { pattern: /^\/api\/instances\/([^\/]+)\/([^\/]+)$/, method: 'GET', handler: handleGetInstances, auth: true },
   { pattern: /^\/api\/logs\/([^\/]+)\/([^\/]+)$/, method: 'GET', handler: handleGetLogs, auth: true },
